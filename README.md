@@ -56,57 +56,39 @@ note :- due to legality many of the question sarvam refuses to translate hence p
 4. Watch the debug lines confirm which case was matched and how many facts were retrieved
 5. The **AI Legal Autopsy panel** renders below with your full 5-section report
 
-**Example query and output (as shown in the screenshot):**
-
 > *"The Bombay High Court allowed Vodafone to provide a 'corporate guarantee' instead of a cash deposit for a 1100-crore tax demand. Is this a Judicial Disconnect that favors multinational corporations over the state's revenue? Contrast this with how the law handles tax recovery for smaller, local entities."*
 
 The system correctly routed this to `vodafone_tax_dispute`, retrieved 3 case fact chunks, and produced a full autopsy covering the ITAT ruling, BNS/BNSS/BSA statutory verification, and a judicial disconnect analysis noting the lack of clear guidelines on corporate guarantees in tax recovery — flagging the inconsistency vs. how smaller entities are treated.
 
 ---
 
+<div style="overflow-x:auto;">
 
 ## 🏗️ Architecture
 
-```
 User Query (any Indian language)
-        │
-        ▼
-┌──────────────────────┐
-│  Language Detection   │  ← langdetect
-│  + Sarvam Translation │  ← Sarvam AI API (to English ) // some times sarvam is not translating due to legal issues
-└──────────┬───────────┘
-           │
-           ▼
-┌──────────────────────┐
-│   LLM Query Router   │  ← Llama 3.3 70B-instruct (Databricks)
-│  (Case Categorizer)  │     Routes to specific case or ALL
-└──────────┬───────────┘
-           │
-           ▼
-┌──────────────────────────────────────────────┐
-│           FAISS Vector Store                  │
-│  ┌─────────────┐  ┌──────────────────────┐   │
-│  │  Case Facts │  │  Statutes (BNS/BNSS/ │   │
-│  │  (per case) │  │        BSA)          │   │
-│  └─────────────┘  └──────────────────────┘   │
-└──────────┬───────────────────────────────────┘
-           │  (Isolated retrieval per category)
-           ▼
-┌──────────────────────┐
-│   Structured Prompt  │  ← PromptTemplate (5-section autopsy)
-│   + LLM Generation   │  ← Llama 3.3 70B-Instruct
-└──────────┬───────────┘
-           │
-           ▼
-┌──────────────────────┐
-│  Sarvam Back-         │  ← Translates English response
-│  Translation          │     back to user's language
-└──────────┬───────────┘
-           │
-           ▼
-    HTML Report (Databricks UI)
-```
-
+        ↓
+Language Detection (langdetect)
+        ↓
+Translation → English (Sarvam API)
+        ↓
+LLM Query Router (Llama 3.3 70B)
+        ↓
+Case Categorization (specific case / ALL)
+        ↓
+Vector Retrieval (FAISS)
+   ├── Case Facts
+   └── Statutes (BNS / BNSS / BSA)
+        ↓
+Filtered Retrieval (per category)
+        ↓
+Structured Prompt (5-section template)
+        ↓
+LLM Generation (Llama 3.3 70B)
+        ↓
+Back Translation (Sarvam API)
+        ↓
+HTML Report (Databricks UI)
 ---
 
 ## 🗂️ Data Sources
