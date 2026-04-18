@@ -51,7 +51,7 @@ The **last cell** renders an interactive UI directly inside the Databricks noteb
 **Step-by-step:**
 1. Locate the **`query` widget** in the top-left corner of the final cell's output panel
 2. Click the text field and **type your legal question** (in English or any supported Indian language)
-note :- due to legality many of the question sarvam refuses to translate hence prefer giving it in english
+note :- due to legality many of the question sarvam refuses to translate hence prefer giving it in english thankyou
 3. Press **Enter** or re-run the last cell
 4. Watch the debug lines confirm which case was matched and how many facts were retrieved
 5. The **AI Legal Autopsy panel** renders below with your full 5-section report
